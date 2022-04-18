@@ -5,7 +5,7 @@ namespace App\Entity;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-
+use Symfony\Component\Validator\Constraints as Assert;
 
 
 /**
@@ -23,16 +23,19 @@ class User
 
     /**
      * @ORM\Column(type="string", length=100)
+     * @Assert\NotBlank()
+     * @Assert\Length(min=2,max=100, minMessage="Name should be at least {{ limit }} characters long",maxMessage="Name should not be longer than {{ limit }} characters")
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\Email(message="'{{ value }}' is not a valid email")
      */
     private $email;
 
     /**
-     * @ORM\Column(type = "boolean",options={"default":false})
+     * @ORM\Column(type = "boolean", nullable=true, options={"default":0})
      */
     private $is_idle;
 
