@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class TaskController extends AbstractController
 {
-    #[Route('/task', name: 'task_list')]
+    #[Route('/', name: 'task_list')]
     public function index(ManagerRegistry $registry,Request $request,FileUpload $fileUpload,ManagerRegistry $managerRegistry): Response
     {
 
@@ -39,7 +39,8 @@ class TaskController extends AbstractController
 
             if($taskForm->isSubmitted() && $taskForm->isValid())
             {
-                $this->update($taskForm->getData(),$fileUpload,$managerRegistry);
+                $this->update($taskForm->getData(),$fileUpload,$managerRegistry,$request);
+                return $this->redirectToRoute("task_list");
             }
 
             return  $this->renderForm("task/index.html.twig",[
@@ -64,6 +65,7 @@ class TaskController extends AbstractController
             $entityManager->persist($task);
 
             $task = $form->getData();
+
 
             $taskAttachment = $form->get("Attachment")->getData();
             $allowedExtensions = ["png","jpg",'jpeg',"pdf","mp4"];
@@ -95,16 +97,18 @@ class TaskController extends AbstractController
     }
 
 
-    private function update($tasksCollection,FileUpload $fileUpload,$managerRegistry)
+    private function update($tasksCollection,FileUpload $fileUpload,$managerRegistry, Request $request)
     {
         $entityManager = $managerRegistry->getManager();
-
-        foreach ($tasksCollection['tasks'] as $task)
+        $allowedExtensions = ["png","jpg",'jpeg',"pdf","mp4"];
+        $allowedUploadSizeInMB = 50;
+        foreach ($tasksCollection['tasks'] as $key => $task)
         {
-            //TODO: Handle upload
-           /* $taskAttachment = $form->get("Attachment")->getData();
-            $allowedExtensions = ["png","jpg",'jpeg',"pdf","mp4"];
-            $allowedUploadSizeInMB = 50;
+
+            $files = $request->files->get("task_collection")['tasks'];
+
+
+            $taskAttachment = $files[$key]['Attachment'];
 
             if($taskAttachment && $fileUpload->isFileExtensionAllowed($taskAttachment->guessExtension(),$allowedExtensions) && $fileUpload->isValidFileSize($taskAttachment->getSize(),$allowedUploadSizeInMB))
             {
@@ -115,7 +119,7 @@ class TaskController extends AbstractController
                     //TODO :Handle error response
                 }
                 $task->setFilePath($fileName);
-            }*/
+            }
             $entityManager->persist($task);
             $sanitizedTaskTitle = filter_var($task->getTitle(),FILTER_SANITIZE_STRING);
             $sanitizedTaskDescription = filter_var($task->getDescription(),FILTER_SANITIZE_STRING);

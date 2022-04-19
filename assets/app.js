@@ -21,5 +21,12 @@ $(document).ready()
     $('.btn-danger').on('click', function(){
         $(this).parent().parent().parent().remove();
         $("form[name='task_collection']").submit();
-    })
+    });
+
+    $('.btn-remove-user').on('click', function(e){
+        e.preventDefault();
+        $(this).parent().parent().remove();
+        $("form[name='user_collection']").submit();
+    });
+
 }

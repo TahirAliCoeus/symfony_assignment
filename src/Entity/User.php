@@ -45,7 +45,7 @@ class User
     private $updated_at;
 
     /**
-     * @ORM\OneToMany(targetEntity=Task::class,mappedBy="user")
+     * @ORM\OneToMany(targetEntity=Task::class,mappedBy="user",cascade={"remove"})
      */
     private $tasks;
 
