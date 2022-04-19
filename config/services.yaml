@@ -28,3 +28,8 @@ services:
             -
                 name: 'doctrine.event_listener'
                 event: 'prePersist'
+
+    App\EventListener\TaskUpdatedListener:
+        tags:
+            - name: 'doctrine.event_listener'
+              event: 'preUpdate'
