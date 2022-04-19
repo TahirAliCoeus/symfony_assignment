@@ -10,3 +10,16 @@ import './styles/app.css';
 
 // start the Stimulus application
 import './bootstrap';
+$(document).ready()
+{
+    const removeFormButton = document.createElement('button');
+    removeFormButton.innerText = 'Delete this tag';
+    removeFormButton.className = "btn btn-danger";
+    removeFormButton.id="deleteBtn";
+    $('#task_collection_tasks').find('.btn-success').parent().append(removeFormButton);
+
+    $('.btn-danger').on('click', function(){
+        $(this).parent().parent().parent().remove();
+        $("form[name='task_collection']").submit();
+    })
+}

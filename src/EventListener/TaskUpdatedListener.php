@@ -15,6 +15,6 @@ class TaskUpdatedListener
         {
             return;
         }
-        $entity->setUpdatedAt(\DateTime::now("now"));
+        $entity->setUpdatedAt(new \DateTime("now"));
     }
 }
