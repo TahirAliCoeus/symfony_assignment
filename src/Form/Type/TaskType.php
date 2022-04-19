@@ -2,15 +2,19 @@
 
 namespace App\Form\Type;
 
+use App\Entity\Task;
 use App\Entity\User;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TaskType extends AbstractType
 {
@@ -29,5 +33,12 @@ class TaskType extends AbstractType
             ->add('user',ChoiceType::class,["choices" => $users,"choice_value" => "id",'choice_label' => 'name','label' => "Select assignee", 'attr' => ['class' => "mt-2"]])
             ->add('Attachment', FileType::class,["mapped" => false,"attr" => ["class" => "mt-2"], 'required' => false])
             ->add("Save",SubmitType::class,['attr' => ['class' => "btn btn-success mt-5"]]);
+    }
+
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefaults([
+            'data_class' => Task::class,
+        ]);
     }
 }
