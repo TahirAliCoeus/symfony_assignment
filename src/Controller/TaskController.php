@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class TaskController extends AbstractController
 {
-    #[Route('/task', name: 'task_list')]
+    #[Route('/', name: 'task_list')]
     public function index(ManagerRegistry $registry,Request $request,FileUpload $fileUpload,ManagerRegistry $managerRegistry): Response
     {
 
@@ -40,6 +40,7 @@ class TaskController extends AbstractController
             if($taskForm->isSubmitted() && $taskForm->isValid())
             {
                 $this->update($taskForm->getData(),$fileUpload,$managerRegistry);
+                return $this->redirectToRoute("task_list");
             }
 
             return  $this->renderForm("task/index.html.twig",[
