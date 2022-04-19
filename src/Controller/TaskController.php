@@ -95,34 +95,42 @@ class TaskController extends AbstractController
     }
 
 
-    private function update($tasksCollection,FileUpload $fileUpload,$managerRegistry)
+    private function update($tasksCollection,FileUpload $fileUpload,ManagerRegistry $managerRegistry)
     {
         $entityManager = $managerRegistry->getManager();
 
-        foreach ($tasksCollection['tasks'] as $task)
-        {
-            //TODO: Handle upload
-           /* $taskAttachment = $form->get("Attachment")->getData();
-            $allowedExtensions = ["png","jpg",'jpeg',"pdf","mp4"];
-            $allowedUploadSizeInMB = 50;
-
-            if($taskAttachment && $fileUpload->isFileExtensionAllowed($taskAttachment->guessExtension(),$allowedExtensions) && $fileUpload->isValidFileSize($taskAttachment->getSize(),$allowedUploadSizeInMB))
-            {
-                $fileUpload->setDestinationPath("uploads/task_attachments/");
-                $fileName = $fileUpload->upload($taskAttachment);
-                if(!$fileName)
-                {
-                    //TODO :Handle error response
-                }
-                $task->setFilePath($fileName);
-            }*/
-            $entityManager->persist($task);
-            $sanitizedTaskTitle = filter_var($task->getTitle(),FILTER_SANITIZE_STRING);
-            $sanitizedTaskDescription = filter_var($task->getDescription(),FILTER_SANITIZE_STRING);
-
-            $task->setTitle($sanitizedTaskTitle);
-            $task->setDescription($sanitizedTaskDescription);
+        $existingTasks = $managerRegistry->getRepository(Task::class)->findAll();
+        foreach ($existingTasks as $existingTask) {
+            if (!in_array($existingTask,$tasksCollection['tasks'])) {
+                $entityManager->remove($existingTask);
+            }
         }
+            foreach ($tasksCollection['tasks'] as $task)
+            {
+                //TODO: Handle upload
+                /* $taskAttachment = $form->get("Attachment")->getData();
+                 $allowedExtensions = ["png","jpg",'jpeg',"pdf","mp4"];
+                 $allowedUploadSizeInMB = 50;
+
+                 if($taskAttachment && $fileUpload->isFileExtensionAllowed($taskAttachment->guessExtension(),$allowedExtensions) && $fileUpload->isValidFileSize($taskAttachment->getSize(),$allowedUploadSizeInMB))
+                 {
+                     $fileUpload->setDestinationPath("uploads/task_attachments/");
+                     $fileName = $fileUpload->upload($taskAttachment);
+                     if(!$fileName)
+                     {
+                         //TODO :Handle error response
+                     }
+                     $task->setFilePath($fileName);
+                 }*/
+                $entityManager->persist($task);
+                $sanitizedTaskTitle = filter_var($task->getTitle(),FILTER_SANITIZE_STRING);
+                $sanitizedTaskDescription = filter_var($task->getDescription(),FILTER_SANITIZE_STRING);
+
+                $task->setTitle($sanitizedTaskTitle);
+                $task->setDescription($sanitizedTaskDescription);
+            }
+
+
 
         $entityManager->flush();
     }
