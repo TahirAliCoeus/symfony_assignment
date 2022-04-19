@@ -17,12 +17,12 @@ use Symfony\Component\Routing\Annotation\Route;
 class TaskController extends AbstractController
 {
     #[Route('/', name: 'task_list')]
-    public function index(ManagerRegistry $registry,Request $request,FileUpload $fileUpload,ManagerRegistry $managerRegistry): Response
+    public function index(ManagerRegistry $registry, Request $request, FileUpload $fileUpload, ManagerRegistry $managerRegistry): Response
     {
 
         $task = new Task();
         $form = $this->createFormBuilder($task)
-            ->add('Add_Task', SubmitType::class,[
+            ->add('Add_Task', SubmitType::class, [
                 'attr' => [
                     'class' => 'btn btn-success',
                     'style' => "width : 100px"
@@ -32,35 +32,33 @@ class TaskController extends AbstractController
             ->setMethod("GET")
             ->getForm();
 
-            $tasks = $registry->getRepository(Task::class)->findAll();
-            $taskForm = $this->createForm( TaskCollectionType::class, ['tasks' =>$tasks]);
+        $tasks = $registry->getRepository(Task::class)->findAll();
+        $taskForm = $this->createForm(TaskCollectionType::class, ['tasks' => $tasks]);
 
-            $taskForm->handleRequest($request);
+        $taskForm->handleRequest($request);
 
-            if($taskForm->isSubmitted() && $taskForm->isValid())
-            {
-                $this->update($taskForm->getData(),$fileUpload,$managerRegistry,$request);
-                return $this->redirectToRoute("task_list");
-            }
+        if ($taskForm->isSubmitted() && $taskForm->isValid()) {
+            $this->update($taskForm->getData(), $fileUpload, $managerRegistry, $request);
+            return $this->redirectToRoute("task_list");
+        }
 
-            return  $this->renderForm("task/index.html.twig",[
-                "form" => $form,
-                "listing_form" =>$taskForm
-            ]);
+        return $this->renderForm("task/index.html.twig", [
+            "form" => $form,
+            "listing_form" => $taskForm
+        ]);
     }
 
     /**
      * @Route ("task/add",name="task_add")
      */
-    public function add(Request $request,ManagerRegistry $managerRegistry,FileUpload $fileUpload)
+    public function add(Request $request, ManagerRegistry $managerRegistry, FileUpload $fileUpload)
     {
         $task = new Task();
-        $form = $this->createForm(TaskType::class,$task);
+        $form = $this->createForm(TaskType::class, $task);
 
         $form->handleRequest($request);
 
-        if($form->isSubmitted() && $form->isValid())
-        {
+        if ($form->isSubmitted() && $form->isValid()) {
             $entityManager = $managerRegistry->getManager();
             $entityManager->persist($task);
 
@@ -68,66 +66,66 @@ class TaskController extends AbstractController
 
 
             $taskAttachment = $form->get("Attachment")->getData();
-            $allowedExtensions = ["png","jpg",'jpeg',"pdf","mp4"];
+            $allowedExtensions = ["png", "jpg", 'jpeg', "pdf", "mp4"];
             $allowedUploadSizeInMB = 50;
 
-            if($taskAttachment && $fileUpload->isFileExtensionAllowed($taskAttachment->guessExtension(),$allowedExtensions) && $fileUpload->isValidFileSize($taskAttachment->getSize(),$allowedUploadSizeInMB))
-            {
+            if ($taskAttachment && $fileUpload->isFileExtensionAllowed($taskAttachment->guessExtension(), $allowedExtensions) && $fileUpload->isValidFileSize($taskAttachment->getSize(), $allowedUploadSizeInMB)) {
                 $fileUpload->setDestinationPath("uploads/task_attachments/");
                 $fileName = $fileUpload->upload($taskAttachment);
-                if(!$fileName)
-                {
+                if (!$fileName) {
                     //TODO :Handle error response
                 }
                 $task->setFilePath($fileName);
             }
-            $sanitizedTaskTitle = filter_var($task->getTitle(),FILTER_SANITIZE_STRING);
-            $sanitizedTaskDescription = filter_var($task->getDescription(),FILTER_SANITIZE_STRING);
+            $sanitizedTaskTitle = filter_var($task->getTitle(), FILTER_SANITIZE_STRING);
+            $sanitizedTaskDescription = filter_var($task->getDescription(), FILTER_SANITIZE_STRING);
 
             $task->setTitle($sanitizedTaskTitle);
             $task->setDescription($sanitizedTaskDescription);
 
             $entityManager->flush();
-            return  $this->redirectToRoute("task_list");
+            return $this->redirectToRoute("task_list");
         }
 
-        return  $this->renderForm("task/create.html.twig",[
+        return $this->renderForm("task/create.html.twig", [
             "form" => $form
         ]);
     }
 
 
-    private function update($tasksCollection,FileUpload $fileUpload,$managerRegistry, Request $request)
+    private function update($tasksCollection, FileUpload $fileUpload, $managerRegistry, Request $request)
     {
         $entityManager = $managerRegistry->getManager();
-        $allowedExtensions = ["png","jpg",'jpeg',"pdf","mp4"];
+        $allowedExtensions = ["png", "jpg", 'jpeg', "pdf", "mp4"];
         $allowedUploadSizeInMB = 50;
-        foreach ($tasksCollection['tasks'] as $key => $task)
-        {
+        foreach ($tasksCollection['tasks'] as $key => $task) {
 
-            $files = $request->files->get("task_collection")['tasks'];
-
-
-            $taskAttachment = $files[$key]['Attachment'];
-
-            if($taskAttachment && $fileUpload->isFileExtensionAllowed($taskAttachment->guessExtension(),$allowedExtensions) && $fileUpload->isValidFileSize($taskAttachment->getSize(),$allowedUploadSizeInMB))
-            {
-                $fileUpload->setDestinationPath("uploads/task_attachments/");
-                $fileName = $fileUpload->upload($taskAttachment);
-                if(!$fileName)
-                {
-                    //TODO :Handle error response
+            $existingTasks = $managerRegistry->getRepository(Task::class)->findAll();
+            foreach ($existingTasks as $existingTask) {
+                if (!in_array($existingTask, $tasksCollection['tasks'])) {
+                    $entityManager->remove($existingTask);
                 }
-                $task->setFilePath($fileName);
+                else
+                {
+                    $files = $request->files->get("task_collection")['tasks'];
+                    $taskAttachment = $files[$key]['Attachment'];
+                    if ($taskAttachment && $fileUpload->isFileExtensionAllowed($taskAttachment->guessExtension(), $allowedExtensions) && $fileUpload->isValidFileSize($taskAttachment->getSize(), $allowedUploadSizeInMB)) {
+                        $fileUpload->setDestinationPath("uploads/task_attachments/");
+                        $fileName = $fileUpload->upload($taskAttachment);
+                        if (!$fileName) {
+                            //TODO :Handle error response
+                        }
+                        $task->setFilePath($fileName);
+                    }
+                    $entityManager->persist($task);
+                    $sanitizedTaskTitle = filter_var($task->getTitle(), FILTER_SANITIZE_STRING);
+                    $sanitizedTaskDescription = filter_var($task->getDescription(), FILTER_SANITIZE_STRING);
+
+                    $task->setTitle($sanitizedTaskTitle);
+                    $task->setDescription($sanitizedTaskDescription);
+                }
             }
-            $entityManager->persist($task);
-            $sanitizedTaskTitle = filter_var($task->getTitle(),FILTER_SANITIZE_STRING);
-            $sanitizedTaskDescription = filter_var($task->getDescription(),FILTER_SANITIZE_STRING);
-
-            $task->setTitle($sanitizedTaskTitle);
-            $task->setDescription($sanitizedTaskDescription);
+            $entityManager->flush();
         }
-
-        $entityManager->flush();
     }
 }
