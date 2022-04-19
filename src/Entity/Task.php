@@ -28,12 +28,12 @@ class Task
     private $description;
 
     /**
-     * @ORM\Column(type= "boolean")
+     * @ORM\Column(type= "string", length=200,nullable=true)
      */
     private $file_path;
 
     /**
-     * @ORM\Column(type= "datetime")
+     * @ORM\Column(type= "datetime",nullable=true)
      */
     private $updated_at;
 
