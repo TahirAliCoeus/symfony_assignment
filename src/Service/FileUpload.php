@@ -9,10 +9,10 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 
 class FileUpload
 {
-    private $destinationPath;
-    private $slugger;
-    private $logger;
-    private $fileName;
+    private string $destinationPath;
+    private SluggerInterface $slugger;
+    private LoggerInterface $logger;
+    private string $fileName;
 
     public function getFileName() : string
     {
@@ -29,7 +29,7 @@ class FileUpload
         $this->logger = $logger;
     }
 
-    public function upload(UploadedFile $file)
+    public function upload(UploadedFile $file): bool
     {
         $originalFileName =  pathinfo($file->getClientOriginalName(),PATHINFO_FILENAME);
         $safeFileName = $this->slugger->slug($originalFileName);
@@ -46,7 +46,7 @@ class FileUpload
         return  true;
     }
 
-    public function validate(UploadedFile $file,$allowedExtentions = [],$allowedSizeInMB = 20)
+    public function validate(UploadedFile $file,$allowedExtentions = [],$allowedSizeInMB = 20): bool
     {
         if(!$this->isFileExtensionAllowed($file->guessClientExtension(),$allowedExtentions))
         {

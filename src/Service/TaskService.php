@@ -29,7 +29,7 @@ class TaskService
         $this->router = $urlGenerator;
     }
 
-    public function addTask($form)
+    public function addTask($form): void
     {
         $task = $form->getData();
 
