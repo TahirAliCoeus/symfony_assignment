@@ -13,7 +13,7 @@ class Task
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type= "integer")
      */
     private $id;
 
@@ -28,33 +28,33 @@ class Task
     private $description;
 
     /**
-     * @ORM\Column(type= "string", length=200,nullable=true)
+     * @ORM\Column(type= "string", length= 200, nullable= true)
      */
-    private $file_path;
+    private $filePath;
 
     /**
-     * @ORM\Column(type= "datetime",nullable=true)
+     * @ORM\Column(type= "datetime",nullable= true)
      */
-    private $updated_at;
+    private $updatedAt;
 
     /**
-     * @ORM\Column(type= "datetime",nullable=true)
+     * @ORM\Column(type= "datetime",nullable= true)
      */
-    private $deleted_at;
+    private $deletedAt;
 
     /**
-     * @ORM\ManyToOne(targetEntity=User::class)
+     * @ORM\ManyToOne(targetEntity= User::class)
      */
     private $user;
 
 
 
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
 
-    public function getTitle(): ?string
+    public function getTitle(): string
     {
         return $this->title;
     }
@@ -66,7 +66,7 @@ class Task
         return $this;
     }
 
-    public function getDescription(): ?string
+    public function getDescription(): string
     {
         return $this->description;
     }
@@ -80,41 +80,41 @@ class Task
 
     public function getFilePath(): ?string
     {
-        return $this->file_path;
+        return $this->filePath;
     }
 
-    public function setFilePath(?string $file_path): self
+    public function setFilePath(?string $filePath): self
     {
-        $this->file_path = $file_path;
+        $this->filePath = $filePath;
 
         return $this;
     }
 
     public function getUpdatedAt(): ?\DateTimeInterface
     {
-        return $this->updated_at;
+        return $this->updatedAt;
     }
 
-    public function setUpdatedAt(\DateTimeInterface $updated_at): self
+    public function setUpdatedAt(\DateTimeInterface $updatedAt): self
     {
-        $this->updated_at = $updated_at;
+        $this->updatedAt = $updatedAt;
 
         return $this;
     }
 
     public function getDeletedAt(): ?\DateTimeInterface
     {
-        return $this->deleted_at;
+        return $this->deletedAt;
     }
 
-    public function setDeletedAt(?\DateTimeInterface $deleted_at): self
+    public function setDeletedAt(?\DateTimeInterface $deletedAt): self
     {
-        $this->deleted_at = $deleted_at;
+        $this->deletedAt = $deletedAt;
 
         return $this;
     }
 
-    public function getUser(): ?User
+    public function getUser(): User
     {
         return $this->user;
     }

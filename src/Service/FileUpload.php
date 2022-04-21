@@ -12,6 +12,17 @@ class FileUpload
     private $destinationPath;
     private $slugger;
     private $logger;
+    private $fileName;
+
+    public function getFileName() : string
+    {
+        return $this->fileName;
+    }
+
+    public function setFileName($fileName): void
+    {
+        $this->fileName = $fileName;
+    }
     public function __construct(SluggerInterface $slugger,LoggerInterface $logger)
     {
         $this->slugger = $slugger;
@@ -26,25 +37,41 @@ class FileUpload
 
         try {
             $file->move($this->destinationPath,$fileName);
+            $this->setFileName($fileName);
         }catch (\Exception $e)
         {
             $this->logger->error($e->getMessage());
             return false;
         }
-        return  $fileName;
+        return  true;
     }
 
-    public function setDestinationPath($path)
+    public function validate(UploadedFile $file,$allowedExtentions = [],$allowedSizeInMB = 20)
+    {
+        if(!$this->isFileExtensionAllowed($file->guessClientExtension(),$allowedExtentions))
+        {
+            return false;
+        }
+
+        if(!$this->isValidFileSize($file->getSize(),$allowedSizeInMB))
+        {
+            return  false;
+        }
+
+        return true;
+    }
+
+    public function setDestinationPath($path): void
     {
         $this->destinationPath = $path;
     }
 
-    public function isFileExtensionAllowed($extension,$allowedExtensions)
+    public function isFileExtensionAllowed($extension,$allowedExtensions): bool
     {
         return in_array($extension,$allowedExtensions);
     }
 
-    public function isValidFileSize($uploadedFileSize,$allowedSizeInMB = 20)
+    public function isValidFileSize($uploadedFileSize,$allowedSizeInMB): bool
     {
         $uploadedFileSize = $uploadedFileSize / (102 * 1024); //Convert size from Bytes to MB
         return $uploadedFileSize <= $allowedSizeInMB;
