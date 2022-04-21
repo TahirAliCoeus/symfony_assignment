@@ -2,22 +2,18 @@
 
 namespace App\Controller;
 
-use App\Entity\Task;
-use App\Form\Type\TaskCollectionType;
-use App\Form\Type\TaskType;
-use App\Service\FileUpload;
 use App\Service\TaskService;
-use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class TaskController extends AbstractController
 {
-    #[Route('/', name: 'task_list')]
-    public function index( Request $request, TaskService $taskService): Response
+    /**
+     * @Route("/",name= "task_list")
+     */
+    public function index(Request $request, TaskService $taskService): Response
     {
         $form = $taskService->getAddTaskButtonForm();
         $taskForm = $taskService->getTaskListingForm();
@@ -34,9 +30,9 @@ class TaskController extends AbstractController
     }
 
     /**
-     * @Route ("task/add",name="task_add")
+     * @Route ("task/add",name= "task_add")
      */
-    public function add(Request $request,TaskService $taskService)
+    public function add(Request $request, TaskService $taskService)
     {
         $form = $taskService->getAddTaskForm();
         $form->handleRequest($request);
@@ -49,7 +45,4 @@ class TaskController extends AbstractController
             "form" => $form
         ]);
     }
-
-
-
 }

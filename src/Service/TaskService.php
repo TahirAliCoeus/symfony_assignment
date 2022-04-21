@@ -6,6 +6,7 @@ use App\Entity\Task;
 use App\Form\Type\TaskCollectionType;
 use App\Form\Type\TaskType;
 use App\Repository\TaskRepository;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -61,7 +62,7 @@ class TaskService
     public function getAddTaskButtonForm(): FormInterface
     {
         $task = new Task();
-        return $this->formFactory->createBuilder(TaskType::class, $task)
+        return $this->formFactory->createBuilder(FormType::class, $task)
             ->add("Add_Task", SubmitType::class, [
                 "attr" => [
                     "class" => "btn btn-success",
