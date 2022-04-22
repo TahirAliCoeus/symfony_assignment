@@ -13,7 +13,7 @@ import './bootstrap';
 $(document).ready()
 {
     const removeFormButton = document.createElement('button');
-    removeFormButton.innerText = 'Delete this tag';
+    removeFormButton.innerText = 'Delete this task';
     removeFormButton.className = "btn btn-danger";
     removeFormButton.id="deleteBtn";
     $('#task_collection_tasks').find('.btn-success').parent().append(removeFormButton);
